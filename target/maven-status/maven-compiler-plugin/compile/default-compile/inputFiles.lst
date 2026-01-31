@@ -1,1 +1,12 @@
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/App.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/dao/ReportDaoJdbc.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/dao/UserDao.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/dao/UserDaoJdbc.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/db/Db.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/Activity.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/Application.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/Company.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/Job.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/User.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/service/UserService.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/ui/ConsoleApp.java

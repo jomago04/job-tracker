@@ -1,1 +1,14 @@
+jobtracker/dao/UserDaoJdbc.class
+jobtracker/model/User.class
+jobtracker/model/Job.class
+jobtracker/ui/ConsoleApp.class
+jobtracker/model/Activity.class
+jobtracker/dao/ReportDaoJdbc$ApplicationRow.class
+jobtracker/service/UserService.class
+jobtracker/dao/ReportDaoJdbc$ActivityRow.class
+jobtracker/model/Company.class
+jobtracker/model/Application.class
 jobtracker/App.class
+jobtracker/db/Db.class
+jobtracker/dao/ReportDaoJdbc.class
+jobtracker/dao/UserDao.class
