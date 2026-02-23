@@ -11,9 +11,10 @@
   <name>job-tracker</name>
 
   <properties>
-    <maven.compiler.source>17</maven.compiler.source>
-    <maven.compiler.target>17</maven.compiler.target>
+    <maven.compiler.source>11</maven.compiler.source>
+    <maven.compiler.target>11</maven.compiler.target>
     <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <exec.mainClass>jobtracker.App</exec.mainClass>
   </properties>
 
   <dependencies>
@@ -31,27 +32,49 @@
       <artifactId>mysql-connector-j</artifactId>
       <version>9.0.0</version>
     </dependency>
+
+    <!-- Spark Java Framework for REST API -->
+    <dependency>
+      <groupId>com.sparkjava</groupId>
+      <artifactId>spark-core</artifactId>
+      <version>2.9.4</version>
+    </dependency>
+
+    <!-- JSON processing with Gson -->
+    <dependency>
+      <groupId>com.google.code.gson</groupId>
+      <artifactId>gson</artifactId>
+      <version>2.10.1</version>
+    </dependency>
+
+    <!-- Apache HttpClient for API testing -->
+    <dependency>
+      <groupId>org.apache.httpcomponents</groupId>
+      <artifactId>httpclient</artifactId>
+      <version>4.5.14</version>
+    </dependency>
   </dependencies>
 
   <build>
     <plugins>
-      <!-- Compiles with Java 17 -->
+      <!-- Compiles with Java 11 -->
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-compiler-plugin</artifactId>
         <version>3.12.1</version>
         <configuration>
-          <release>17</release>
+          <release>11</release>
         </configuration>
       </plugin>
 
       <!-- Run App.java with: mvn exec:java -->
+      <!-- Run TestScenarios with: mvn exec:java -Dexec.mainClass=jobtracker.testing.TestScenarios -->
       <plugin>
         <groupId>org.codehaus.mojo</groupId>
         <artifactId>exec-maven-plugin</artifactId>
         <version>3.3.0</version>
         <configuration>
-          <mainClass>jobtracker.App</mainClass>
+          <mainClass>${exec.mainClass}</mainClass>
         </configuration>
       </plugin>
     </plugins>

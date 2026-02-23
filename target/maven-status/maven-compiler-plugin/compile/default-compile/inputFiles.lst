@@ -1,4 +1,9 @@
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/App.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/business/ActivityManager.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/business/ApplicationManager.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/business/CompanyManager.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/business/JobManager.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/business/UserManager.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/dao/ReportDaoJdbc.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/dao/UserDao.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/dao/UserDaoJdbc.java
@@ -8,5 +13,12 @@
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/Company.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/Job.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/model/User.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/service/ErrorHandler.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/service/JobTrackerRestService.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/service/ResponseBuilder.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/service/UserService.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/testing/ApiClient.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/testing/BusinessLayerTestScenarios.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/testing/EndpointTestSuiteRunner.java
+/Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/testing/RestApiConsoleClient.java
 /Users/joshuagould/Desktop/Building Secure Software/job-tracker/src/main/java/jobtracker/ui/ConsoleApp.java
