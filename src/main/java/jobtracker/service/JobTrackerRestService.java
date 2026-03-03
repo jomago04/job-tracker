@@ -8,6 +8,7 @@ import spark.Request;
 import spark.Response;
 
 import java.util.List;
+import java.io.InputStream;
 
 import static spark.Spark.*;
 
@@ -83,6 +84,38 @@ public class JobTrackerRestService {
     public static void main(String[] args) {
         // Configure server
         port(8080);
+
+        // =====================================================================
+        // STATIC FILE SERVING - Serve frontend from classpath
+        // =====================================================================
+        staticFiles.location("/public");
+
+        // Serve index.html for root path and SPA navigation
+        get("/", (req, res) -> {
+            try {
+                InputStream is = JobTrackerRestService.class.getResourceAsStream("/public/index.html");
+                if (is != null) {
+                    res.type("text/html");
+                    return new String(is.readAllBytes());
+                } else {
+                    return "Frontend files not found";
+                }
+            } catch (Exception e) {
+                return "Error loading frontend: " + e.getMessage();
+            }
+        });
+
+        // =====================================================================
+        // SECURITY MIDDLEWARE - Add security headers
+        // =====================================================================
+        before((req, res) -> {
+            // Security headers (no CORS needed since frontend is same-origin)
+            res.header("X-Content-Type-Options", "nosniff");
+            res.header("X-Frame-Options", "DENY");
+            res.header("X-XSS-Protection", "1; mode=block");
+        });
+
+        // No CORS preflight needed for same-origin requests
 
         // Check database connectivity
         try {
