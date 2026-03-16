@@ -1,5 +1,4 @@
 jobtracker/service/JobTrackerRestService$StatusUpdate.class
-jobtracker/dao/UserDaoJdbc.class
 jobtracker/model/User.class
 jobtracker/model/Job.class
 jobtracker/business/ActivityManager.class
@@ -10,18 +9,13 @@ jobtracker/dao/ReportDaoJdbc$ApplicationRow.class
 jobtracker/service/JobTrackerRestService.class
 jobtracker/service/ResponseBuilder$ErrorResponse.class
 jobtracker/model/Company.class
-jobtracker/testing/RestApiConsoleClient.class
-jobtracker/App.class
 jobtracker/service/ResponseBuilder.class
 jobtracker/testing/ApiClient$ApiResponse.class
 jobtracker/testing/EndpointTestSuiteRunner$TestResult.class
-jobtracker/dao/UserDao.class
-jobtracker/ui/ConsoleApp.class
 jobtracker/service/ErrorHandler.class
 jobtracker/testing/EndpointTestSuiteRunner$TestCondition.class
 jobtracker/business/CompanyManager.class
 jobtracker/testing/ApiClient.class
-jobtracker/service/UserService.class
 jobtracker/dao/ReportDaoJdbc$ActivityRow.class
 jobtracker/business/JobManager.class
 jobtracker/model/Application.class
@@ -30,6 +24,5 @@ jobtracker/db/Db.class
 jobtracker/dao/ReportDaoJdbc$JobRow.class
 jobtracker/dao/ReportDaoJdbc.class
 jobtracker/dao/ReportDaoJdbc$CompanyRow.class
-jobtracker/testing/BusinessLayerTestScenarios.class
 jobtracker/business/UserManager.class
 jobtracker/service/JobTrackerRestService$TextUpdate.class

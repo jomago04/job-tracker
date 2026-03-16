@@ -118,6 +118,31 @@ class ApiClient {
         uiManager.displayResult('companies', result);
     }
 
+    // Helper for UI workflows (does not update the Companies tab UI)
+    async fetchCompanies(limit = 1000, offset = 0) {
+        return await this.fetch(`/companies?limit=${limit}&offset=${offset}`);
+    }
+
+    async findCompanyIdByName(name) {
+        if (!name || name.trim() === '') {
+            return { success: true, status: 200, data: null, duration: '0.00' };
+        }
+
+        const normalized = name.trim().toLowerCase();
+        const result = await this.fetchCompanies(1000, 0);
+        if (!result.success || !Array.isArray(result.data)) {
+            return result;
+        }
+
+        const match = result.data.find(c => (c.name || '').trim().toLowerCase() === normalized);
+        return {
+            success: true,
+            status: 200,
+            data: match ? match.cuid : null,
+            duration: result.duration
+        };
+    }
+
     prevPageCompanies() {
         const newOffset = Math.max(0, companyPaginationState.offset - companyPaginationState.limit);
         this.getAllCompanies(companyPaginationState.limit, newOffset);
@@ -262,6 +287,24 @@ class ApiClient {
     // =====================================================================
     // CREATE OPERATIONS (POST)
     // =====================================================================
+
+    async createUser(email, password, name) {
+        if (!email || email.trim() === '' || !password || password.trim() === '' || !name || name.trim() === '') {
+            uiManager.displayError('users', 'Name, email, and password are required');
+            return;
+        }
+
+        uiManager.displayLoading('users');
+        const result = await this.fetch('/users', {
+            method: 'POST',
+            body: {
+                email: email.trim(),
+                passwordHash: password.trim(),
+                name: name.trim()
+            }
+        });
+        uiManager.displayResult('users', result);
+    }
 
     async createCompany(name, industry, city, state, url) {
         if (!name || name.trim() === '') {
@@ -446,6 +489,7 @@ class UIManager {
             details:        { label: 'Details',            icon: 'fa-info-circle' },
             // Generic
             createdAt:      { label: 'Created',           icon: 'fa-calendar-plus',  isDate: true },
+            applicationIds: { label: 'Application IDs',   icon: 'fa-list' },
         };
         return configs[key] || { label: this.humanize(key), icon: 'fa-circle' };
     }
@@ -477,6 +521,12 @@ class UIManager {
 
     formatValue(value, config) {
         if (value === null || value === undefined || value === '') return '<span class="text-muted">—</span>';
+
+        if (Array.isArray(value)) {
+            if (value.length === 0) return '<span class="text-muted">—</span>';
+            const joined = value.map(v => String(v)).join(', ');
+            return `<code class="user-select-all small">${this.escapeHtml(joined)}</code>`;
+        }
 
         if (config.hidden) return '<span class="text-muted fst-italic">••••••••</span>';
 
@@ -639,12 +689,71 @@ const apiClient = new ApiClient();
 const uiManager = new UIManager();
 
 // =====================================================================
+// CREATE APP COMPANY SELECT (avoid duplicate companies)
+// =====================================================================
+function applyCreateAppCompanySelection() {
+    const select = document.getElementById('createCompanySelect');
+    if (!select) return;
+
+    const disabled = select.value && select.value.trim() !== '';
+    const fields = [
+        'createCompanyName',
+        'createCompanyIndustry',
+        'createCompanyCity',
+        'createCompanyState',
+        'createCompanyURL'
+    ];
+
+    fields.forEach(id => {
+        const el = document.getElementById(id);
+        if (el) el.disabled = disabled;
+    });
+}
+
+async function refreshCreateAppCompanySelect() {
+    const select = document.getElementById('createCompanySelect');
+    if (!select) return;
+
+    const previous = select.value;
+    select.innerHTML = '<option value="">Loading companies...</option>';
+
+    const result = await apiClient.fetchCompanies(1000, 0);
+    if (!result.success || !Array.isArray(result.data)) {
+        select.innerHTML = '<option value="">-- Unable to load companies --</option>';
+        const msg = result.data?.error || result.error || 'Failed to load companies';
+        uiManager.displayError('createApp', msg);
+        return;
+    }
+
+    const companies = [...result.data].sort((a, b) => (a.name || '').localeCompare(b.name || ''));
+
+    select.innerHTML =
+        '<option value="">-- Create new / type company name below --</option>' +
+        companies.map(c => `<option value="${c.cuid}">${c.name} (${c.cuid})</option>`).join('');
+
+    if (previous) {
+        select.value = previous;
+    }
+
+    applyCreateAppCompanySelection();
+}
+
+// Initialize the company select if the Create Application tab exists
+const createCompanySelectEl = document.getElementById('createCompanySelect');
+if (createCompanySelectEl) {
+    createCompanySelectEl.addEventListener('change', applyCreateAppCompanySelection);
+    refreshCreateAppCompanySelect();
+}
+
+// =====================================================================
 // CREATE APPLICATION WORKFLOW
 // =====================================================================
 async function createApplicationWorkflow() {
     uiManager.displayLoading('createApp');
 
     // Get form values
+    const selectedCompanyID = document.getElementById('createCompanySelect')?.value || '';
+
     const companyName = document.getElementById('createCompanyName').value;
     const companyIndustry = document.getElementById('createCompanyIndustry').value;
     const companyCity = document.getElementById('createCompanyCity').value;
@@ -662,27 +771,49 @@ async function createApplicationWorkflow() {
     const appSource = document.getElementById('createAppSource').value;
     const appNotes = document.getElementById('createAppNotes').value;
 
+    const companyNameNeeded = !selectedCompanyID;
+
     // Validate required fields
-    if (!companyName || !jobTitle || !jobEmploymentType || !jobWorkType || !appUserID) {
-        uiManager.displayError('createApp',
-            'Please fill in all required fields (marked with *)');
+    if ((companyNameNeeded && !companyName) || !jobTitle || !jobEmploymentType || !jobWorkType || !appUserID) {
+        uiManager.displayError('createApp', 'Please fill in all required fields (Job + User UUID, and Company Name if not selecting an existing company)');
         return;
     }
 
     try {
-        // Step 1: Create Company
-        console.log('Step 1: Creating company...');
-        const companyResult = await apiClient.createCompany(
-            companyName, companyIndustry, companyCity, companyState, companyURL
-        );
+        // Step 1: Resolve Company ID (reuse existing if possible)
+        let companyID = selectedCompanyID;
 
-        if (!companyResult.success) {
-            uiManager.displayError('createApp', `Failed to create company: ${companyResult.error || 'Unknown error'}`);
-            return;
+        if (!companyID) {
+            console.log('Step 1: Checking for existing company by name...');
+            const existingCompany = await apiClient.findCompanyIdByName(companyName);
+
+            if (!existingCompany.success) {
+                const msg = existingCompany.data?.error || existingCompany.error || 'Unknown error';
+                uiManager.displayError('createApp', `Failed to lookup company: ${msg}`);
+                return;
+            }
+
+            if (existingCompany.data) {
+                companyID = existingCompany.data;
+                console.log('Reusing existing company:', companyID);
+            } else {
+                console.log('Step 1: Creating company...');
+                const companyResult = await apiClient.createCompany(
+                    companyName, companyIndustry, companyCity, companyState, companyURL
+                );
+
+                if (!companyResult || !companyResult.success) {
+                    const msg = companyResult?.data?.error || companyResult?.error || 'Unknown error';
+                    uiManager.displayError('createApp', `Failed to create company: ${msg}`);
+                    return;
+                }
+
+                companyID = companyResult.data;
+                console.log('Company created:', companyID);
+            }
+        } else {
+            console.log('Step 1: Using selected company:', companyID);
         }
-
-        const companyID = companyResult.data;
-        console.log('Company created:', companyID);
 
         // Step 2: Create Job
         console.log('Step 2: Creating job...');
@@ -691,7 +822,8 @@ async function createApplicationWorkflow() {
         );
 
         if (!jobResult || !jobResult.success) {
-            uiManager.displayError('createApp', `Failed to create job: ${jobResult?.error || 'Unknown error'}`);
+            const msg = jobResult?.data?.error || jobResult?.error || 'Unknown error';
+            uiManager.displayError('createApp', `Failed to create job: ${msg}`);
             return;
         }
 
@@ -705,7 +837,8 @@ async function createApplicationWorkflow() {
         );
 
         if (!appResult || !appResult.success) {
-            uiManager.displayError('createApp', `Failed to create application: ${appResult?.error || 'Unknown error'}`);
+            const msg = appResult?.data?.error || appResult?.error || 'Unknown error';
+            uiManager.displayError('createApp', `Failed to create application: ${msg}`);
             return;
         }
 
@@ -746,6 +879,11 @@ async function createApplicationWorkflow() {
         responseDiv.innerHTML = successHTML;
 
         // Clear form
+        const companySelect = document.getElementById('createCompanySelect');
+        if (companySelect) {
+            companySelect.value = '';
+        }
+
         document.getElementById('createCompanyName').value = '';
         document.getElementById('createCompanyIndustry').value = '';
         document.getElementById('createCompanyCity').value = '';
@@ -760,6 +898,8 @@ async function createApplicationWorkflow() {
         document.getElementById('createAppUserID').value = '';
         document.getElementById('createAppSource').value = '';
         document.getElementById('createAppNotes').value = '';
+
+        applyCreateAppCompanySelection();
 
     } catch (error) {
         console.error('Error in workflow:', error);

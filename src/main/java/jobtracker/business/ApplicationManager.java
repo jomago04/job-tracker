@@ -56,6 +56,13 @@ public class ApplicationManager {
         return dao.listApplicationsDetailedPaged(limit, offset);
     }
 
+    public List<String> getApplicationIdsForUser(String uuid) {
+        if (uuid == null || uuid.trim().isEmpty()) {
+            return List.of();
+        }
+        return dao.listApplicationIdsForUser(uuid);
+    }
+
     public void deleteApplication(String auid) {
         if (auid == null || auid.trim().isEmpty()) {
             throw new IllegalArgumentException("Application ID is required");

@@ -171,7 +171,7 @@ public class JobTrackerRestService {
 
         /**
          * GET /api/users/{uuid} - Get user by UUID
-         * Returns: User object with all fields
+         * Returns: User fields + list of the user's application IDs
          * Status: 200 Success | 404 Not Found | 500 Error
          *
          * curl http://localhost:8080/api/users/550e8400-e29b-41d4-a716-446655440000
@@ -186,7 +186,15 @@ public class JobTrackerRestService {
                     return ErrorHandler.notFound(res, "User not found: " + uuid);
                 }
 
-                return ResponseBuilder.success(user);
+                java.util.LinkedHashMap<String, Object> payload = new java.util.LinkedHashMap<>();
+                payload.put("uuid", user.uuid);
+                payload.put("email", user.email);
+                payload.put("passwordHash", user.passwordHash);
+                payload.put("name", user.name);
+                payload.put("createdAt", user.createdAt);
+                payload.put("applicationIds", appMgr.getApplicationIdsForUser(uuid));
+
+                return ResponseBuilder.success(payload);
             } catch (Exception e) {
                 return ErrorHandler.internalError(res, e);
             }

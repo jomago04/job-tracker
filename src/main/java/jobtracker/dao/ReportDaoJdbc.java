@@ -346,6 +346,27 @@ public class ReportDaoJdbc {
         }
     }
 
+    public List<String> listApplicationIdsForUser(String uuid) {
+        String sql = "SELECT auid FROM application WHERE uuid = ? ORDER BY applied_at DESC";
+
+        List<String> out = new ArrayList<>();
+        try (Connection conn = Db.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, uuid);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    out.add(rs.getString("auid"));
+                }
+            }
+            return out;
+
+        } catch (SQLException e) {
+            throw new RuntimeException("listApplicationIdsForUser failed", e);
+        }
+    }
+
     public boolean userEmailExists(String email) {
         String sql = "SELECT 1 FROM `user` WHERE email = ?";
 
